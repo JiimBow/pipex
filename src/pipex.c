@@ -6,114 +6,67 @@
 /*   By: jodone <jodone@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/03 13:47:53 by jodone            #+#    #+#             */
-/*   Updated: 2025/12/08 13:18:04 by jodone           ###   ########.fr       */
+/*   Updated: 2025/12/08 14:41:07 by jodone           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../pipex.h"
 
-void	pipex(int f1, int f2, char **av, char **envp)
+void	exec_process(char *cmd, char **envp)
 {
-	int		end[2];
-	pid_t	pid;
+	char	*path_cmd;
+	char	**arg_cmd;
 
-	pipe(end);
-	pid = fork();
-	if (pid < 0)
-		return (perror("fork"));
-	if (pid == 0)
+	arg_cmd = ft_split(cmd, ' ');
+	path_cmd = find_path(arg_cmd[0], envp);
+	if (execve(path_cmd, arg_cmd, envp) == -1)
 	{
-		dup2(f1, STDIN_FILENO);
-		dup2(end[1], STDOUT_FILENO);
-		close(end[0]);
-		close(f1);
+		ft_putstr_fd("pipex : command not found : ", 2);
+		ft_putendl_fd(arg_cmd[0], 2);
+		pipex_free(arg_cmd);
+		exit(0);
 	}
-	else
-	{
-		int	status;
+}
 
-		waitpid(-1, &status, 0);
-		dup2(f2, STDOUT_FILENO);
-		dup2(end[0], STDIN_FILENO);
-		close(end[1]);
-		close(f2);
-	}
+void	child_process(char **av, int *pipefd, char **envp)
+{
+	int	fd;
+
+	fd = open(av[1], O_RDONLY);
+	dup2(fd, STDIN_FILENO);
+	dup2(pipefd[1], STDOUT_FILENO);
+	close(pipefd[0]);
+	close(pipefd[1]);
+	close(fd);
+	exec_process(av[2], envp);
+}
+
+void	parent_process(char **av, int *pipefd, char **envp)
+{
+	int	fd;
+
+	fd = open(av[4], O_CREAT | O_WRONLY | O_TRUNC, 0644);
+	dup2(fd, STDOUT_FILENO);
+	dup2(pipefd[0], STDIN_FILENO);
+	close(pipefd[1]);
+	close(pipefd[0]);
+	close(fd);
+	exec_process(av[3], envp);
 }
 
 int	main(int ac, char **av, char **envp)
 {
-	int	f1;
-	int	f2;
+	int		pipefd[2];
+	pid_t	pid;
 
-	f1 = open(av[1], O_RDONLY);
-	f2 = open(av[4], O_CREAT | O_RDWR | O_TRUNC, 0664);
-	if (f1 < 0 || f2 < 0)
+	if (ac != 5)
 		return (1);
-	pipex(f1, f2, av, envp);
+	if (pipe(pipefd) == -1)
+		return (1);
+	pid = fork();
+	if (pid < 0)
+		return (1);
+	if (pid == 0)
+		child_process(av, pipefd, envp);
+	parent_process(av, pipefd, envp);
 }
-
-// void	pipex(char *cmd1, char *cmd2, int ac, char **av, char **envp)
-// {
-// 	int		pipefd[2];
-// 	char	**cmd1arg;
-// 	char	**cmd2arg;
-// 	pid_t	pid1;
-// 	pid_t	pid2;
-
-// 	cmd1arg = ft_split(av[2], ' ');
-// 	cmd2arg = ft_split(av[3], ' ');
-// 	pipefd[0] = open(av[1], O_RDONLY);
-// 	pipefd[1] = open(av[ac - 1], O_TRUNC | O_WRONLY | O_CREAT, 0644);
-// 	if (pipe(pipefd) == -1)
-// 	{
-// 		perror("pipe");
-// 		exit(EXIT_FAILURE);
-// 	}
-// 	pid1 = fork();
-// 	if (pid1 == -1)
-// 	{
-// 		perror("fork");
-// 		exit(EXIT_FAILURE);
-// 	}
-// 	else if (pid1 == 0)
-// 	{
-// 		dup2(pipefd[1], STDOUT_FILENO);
-// 		close(pipefd[1]);
-// 		close(pipefd[0]);
-// 		execve(cmd1, cmd1arg, envp);
-// 		exit(EXIT_SUCCESS);
-// 	}
-
-// 	pid2 = fork();
-// 	if (pid2 == -1)
-// 	{
-// 		perror("fork");
-// 		exit(EXIT_FAILURE);
-// 	}
-// 	else if (pid2 == 0)
-// 	{
-// 		dup2(pipefd[0], STDIN_FILENO);
-// 		close(pipefd[0]);
-// 		close(pipefd[1]);
-// 		execve(cmd2, cmd2arg, envp);
-// 		exit(EXIT_SUCCESS);
-// 	}
-// }
-
-// int	main(int ac, char **av, char **envp)
-// {
-// 	char	**cmd1arg;
-// 	char	**cmd2arg;
-// 	char	*cmd1;
-// 	char	*cmd2;
-
-// 	(void)ac;
-// 	(void)av;
-// 	(void)envp;
-// 	cmd1arg = ft_split(av[2], ' ');
-// 	cmd2arg = ft_split(av[3], ' ');
-// 	cmd1 = find_path(cmd1arg[0], envp);
-// 	cmd2 = find_path(cmd2arg[0], envp);
-// 	pipex(cmd1, cmd2, ac, av, envp);
-// 	return (0);
-// }

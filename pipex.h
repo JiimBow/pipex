@@ -6,7 +6,7 @@
 /*   By: jodone <jodone@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/03 13:48:24 by jodone            #+#    #+#             */
-/*   Updated: 2025/12/04 10:43:59 by jodone           ###   ########.fr       */
+/*   Updated: 2025/12/08 14:21:10 by jodone           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 # include "ft_printf.h"
 # include <sys/wait.h>
 
-char	*find_path(char *cmd, char **envp);
+char		*find_path(char *cmd, char **envp);
+void		pipex_free(char **str);
 
 #endif
