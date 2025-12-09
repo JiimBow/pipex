@@ -6,7 +6,7 @@
 /*   By: jodone <jodone@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 15:35:26 by jodone            #+#    #+#             */
-/*   Updated: 2025/12/09 16:46:50 by jodone           ###   ########.fr       */
+/*   Updated: 2025/12/09 16:51:47 by jodone           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ void	error_return(char *first_cmd, char *filename)
 	ft_putstr_fd(filename, 2);
 	ft_putstr_fd(": Permission denied\n", 2);
 	pipex_free(arg_cmd);
+	exit(EXIT_FAILURE);
 }
 
 void	exec_process(char *cmd, char **envp)
@@ -83,6 +84,9 @@ int	main(int ac, char **av, char **envp)
 		child_process(av[i], envp);
 		i++;
 	}
-	dup2(fd2, STDOUT_FILENO);
+	if (fd2 < 0)
+		error_return(av[ac - 2], av[ac - 1]);
+	else
+		dup2(fd2, STDOUT_FILENO);
 	exec_process(av[i], envp);
 }
