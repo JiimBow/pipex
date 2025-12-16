@@ -6,7 +6,7 @@
 /*   By: jodone <jodone@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 15:35:26 by jodone            #+#    #+#             */
-/*   Updated: 2025/12/09 16:51:47 by jodone           ###   ########.fr       */
+/*   Updated: 2025/12/16 14:08:37 by jodone           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,12 +55,36 @@ void	child_process(char *av, char **envp)
 	{
 		dup2(pipefd[1], STDOUT_FILENO);
 		close(pipefd[0]);
+		close(pipefd[1]);
 		exec_process(av, envp);
 	}
 	else
 	{
 		dup2(pipefd[0], STDIN_FILENO);
 		close(pipefd[1]);
+		close(pipefd[0]);
+	}
+}
+
+void	open_file(int ac, char **av, int fd, int index_file)
+{
+	if (index_file == 1)
+	{
+		fd = open(av[1], O_RDONLY);
+		if (fd < 0)
+			error_return(av[2], av[1]);
+		else
+			dup2(fd, STDIN_FILENO);
+		close(fd);
+	}
+	else if (index_file == 2)
+	{
+		fd = open(av[ac - 1], O_TRUNC | O_WRONLY | O_CREAT, 0644);
+		if (fd < 0)
+			error_return(av[ac - 2], av[ac - 1]);
+		else
+			dup2(fd, STDOUT_FILENO);
+		close(fd);
 	}
 }
 
@@ -69,24 +93,20 @@ int	main(int ac, char **av, char **envp)
 	int		fd1;
 	int		fd2;
 	int		i;
+	int		status;
 
+	fd1 = -1;
+	fd2 = -1;
 	if (ac < 5)
+	{
+		ft_putstr_fd("Error, not enough arguments", 2);
 		return (1);
-	fd1 = open(av[1], O_RDONLY);
-	fd2 = open(av[ac - 1], O_TRUNC | O_WRONLY | O_CREAT, 0644);
-	if (fd1 < 0)
-		error_return(av[2], av[1]);
-	else
-		dup2(fd1, STDIN_FILENO);
+	}
+	open_file(ac, av, fd1, 1);
 	i = 2;
 	while (i < ac - 2)
-	{
-		child_process(av[i], envp);
-		i++;
-	}
-	if (fd2 < 0)
-		error_return(av[ac - 2], av[ac - 1]);
-	else
-		dup2(fd2, STDOUT_FILENO);
+		child_process(av[i++], envp);
+	open_file(ac, av, fd2, 2);
+	waitpid(-1, &status, 0);
 	exec_process(av[i], envp);
 }

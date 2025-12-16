@@ -6,7 +6,7 @@
 /*   By: jodone <jodone@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/03 13:47:53 by jodone            #+#    #+#             */
-/*   Updated: 2025/12/09 16:37:54 by jodone           ###   ########.fr       */
+/*   Updated: 2025/12/16 14:08:40 by jodone           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void	parent_process(char **av, int *pipefd, char **envp)
 	int	fd;
 	int	status;
 
-	fd = open(av[4], O_TRUNC | O_WRONLY | O_CREAT , 0644);
+	fd = open(av[4], O_TRUNC | O_WRONLY | O_CREAT, 0644);
 	if (fd < 0)
 	{
 		close(pipefd[1]);
@@ -89,7 +89,10 @@ int	main(int ac, char **av, char **envp)
 	pid_t	pid;
 
 	if (ac != 5)
+	{
+		ft_putstr_fd("Need to be like : ./pipex infile cmd1 cmd2 outfile\n", 2);
 		return (1);
+	}
 	if (pipe(pipefd) == -1)
 		return (1);
 	pid = fork();
