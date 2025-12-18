@@ -6,7 +6,7 @@
 /*   By: jodone <jodone@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 14:10:11 by jodone            #+#    #+#             */
-/*   Updated: 2025/12/18 17:30:20 by jodone           ###   ########.fr       */
+/*   Updated: 2025/12/18 17:52:37 by jodone           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,5 +69,6 @@ int	main(int ac, char **av, char **envp)
 	}
 	close(child.fdin);
 	close(child.fdout);
-	wait(NULL);
+	while (wait(NULL) > 0)
+		;
 }

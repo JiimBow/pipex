@@ -6,7 +6,7 @@
 /*   By: jodone <jodone@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/17 11:01:32 by jodone            #+#    #+#             */
-/*   Updated: 2025/12/18 17:30:53 by jodone           ###   ########.fr       */
+/*   Updated: 2025/12/18 18:23:12 by jodone           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,12 +48,44 @@ void	process(t_pipex *child, int i, char *av, char **envp)
 	}
 }
 
+void	here_doc(t_pipex *child, char *limiter)
+{
+	char	*until_lim;
+	int		pipe_doc[2];
+
+	if (pipe(pipe_doc) == -1)
+		exit(EXIT_FAILURE);
+	until_lim = NULL;
+	while (1)
+	{
+		until_lim = get_next_line(STDIN_FILENO);
+		if (ft_strncmp(until_lim, limiter, ft_strlen(limiter)) == 0)
+		{
+			free(until_lim);
+			break ;
+		}
+		write(pipe_doc[1], until_lim, ft_strlen(until_lim));
+		free(until_lim);				
+	}
+	close(pipe_doc[1]);
+	child->fdin = pipe_doc[0];
+}
+
 int	main(int ac, char **av, char **envp)
 {
 	t_pipex	child;
 	int		i;
 
-	if (ac < 5)
+	if (ft_strncmp(av[1], "here_doc", 8) == 0)
+	{
+		if (ac < 6)
+		{
+			ft_putstr_fd("Must be : ./pipex here_doc LIM cmd1 cmd2 outfile\n", 2);
+			return (1);
+		}
+		
+	}
+	else if (ac < 5)
 	{
 		ft_putstr_fd("Must be : ./pipex infile cmd1...cmdn outfile\n", 2);
 		return (1);
@@ -69,5 +101,6 @@ int	main(int ac, char **av, char **envp)
 	}
 	close(child.fdin);
 	close(child.fdout);
-	wait(NULL);
+	while (wait(NULL) > 0)
+		;
 }
