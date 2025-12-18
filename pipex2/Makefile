@@ -6,7 +6,7 @@
 #    By: jodone <jodone@student.42angouleme.fr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/20 10:50:57 by jodone            #+#    #+#              #
-#    Updated: 2025/12/08 15:37:24 by jodone           ###   ########.fr        #
+#    Updated: 2025/12/17 11:02:36 by jodone           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,9 +17,11 @@ SRC_DIR= src/
 BONUS_DIR= bonus/
 
 SRC= $(SRC_DIR)pipex.c \
-	$(SRC_DIR)find_path.c
+	$(SRC_DIR)find_path.c \
+	$(SRC_DIR)struct_init.c
 
 SRC_BONUS= $(SRC_DIR)find_path.c \
+			$(SRC_DIR)struct_init.c \
 			$(BONUS_DIR)pipex_bonus.c
 
 INCLUDES=-I pipex.h \

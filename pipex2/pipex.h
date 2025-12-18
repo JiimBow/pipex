@@ -6,7 +6,7 @@
 /*   By: jodone <jodone@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/03 13:48:24 by jodone            #+#    #+#             */
-/*   Updated: 2025/12/16 16:02:37 by jodone           ###   ########.fr       */
+/*   Updated: 2025/12/17 16:33:03 by jodone           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,15 +23,19 @@
 
 typedef struct s_pipex
 {
-	char			*path;
-	char			*args;
-	int				fdin;
-	int				fdout;
+	char	*path;
+	char	**args;
+	int		fdin;
+	int		fdout;
+	int		pipefd[2];
+	int		prev_fd;
+	int		way;
+	int		nb_cmd;
 }	t_pipex;
 
-
-char		*find_path(char *cmd, char **envp);
-void		pipex_free(char **str);
-void		s_init(t_pipex *child, char *av, char **envp);
+char	*find_path(char *cmd, char **envp);
+void	pipex_free(char **str);
+void	free_struct(t_pipex *child);
+void	s_init(t_pipex *child, int ac, char *av, char **envp);
 
 #endif

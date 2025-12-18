@@ -6,7 +6,7 @@
 /*   By: jodone <jodone@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/03 16:10:24 by jodone            #+#    #+#             */
-/*   Updated: 2025/12/16 15:04:47 by jodone           ###   ########.fr       */
+/*   Updated: 2025/12/17 10:54:11 by jodone           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ char	*find_path(char *cmd, char **envp)
 
 	i = 0;
 	if (cmd_check(cmd) == 1)
-		return (cmd);
+		return (ft_strdup(cmd));
 	while (envp[i] && ft_strncmp(envp[i], "PATH=", 5) != 0)
 		i++;
 	paths = ft_split(envp[i] + 5, ':');
